@@ -16,9 +16,31 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/', function () {
     return view('home');
 });
-Route::get('/cart', 'CartController@index')->name('cart');
-Route::delete('cart/destroy', 'CartController@massDestroy')->name('cart.massDestroy');
-Route::get('/wishlist', 'WishListController@index')->name('wishlist');
+Route::get('checkout', function () {
+    return view('checkout'); // Create a view named checkout.blade.php
+});
+Route::post('/payment', [OrderController::class, 'processPayment'])->name('payment.process');
+Route::get('/order/confirmation/{orderId}', [OrderController::class, 'confirmation'])->name('order.confirmation');
+Route::post('payment/create', [CheckoutController::class, 'createPayment']);
+Route::get('payment/status', [CheckoutController::class, 'paymentStatus']);
+Route::get('payment/cancel', [CheckoutController::class, 'paymentCancel']);
+// Display the cart
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+
+// Add a product to the cart
+Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+
+// Update a product quantity in the cart
+Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
+
+// Remove a product from the cart
+Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
+
+// Clear the cart
+Route::get('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+Route::get('/wishlist', [WishlistController::class, 'index']);
+Route::post('/wishlist/add', [WishlistController::class, 'add']);
+Route::post('/wishlist/remove', [WishlistController::class, 'remove']);
 Route::delete('wishlist/destroy', 'WishListController@massDestroy')->name('wishlist.massDestroy');
 })->middleware['auth'];
 Route::post('/logout', [UserController::class, 'logout'])->name('logout');
